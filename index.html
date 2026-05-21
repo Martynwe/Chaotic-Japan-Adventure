@@ -26,6 +26,8 @@ Welcome to the interactive version of the Chaotic Japan Adventure Points Game! E
 
 <p>Name: <span id="championName">---</span></p>
 
+<button onclick="saveData()">💾 Save Data</button> <button onclick="loadData()">📂 Load Data</button>
+
 <script> function updatePlayerName(playerNum) { const input = document.getElementById('player' + playerNum); const nameSpan = document.getElementById('name' + playerNum); nameSpan.textContent = input.value || ('Player ' + playerNum); updateTotals(); }
 
 function updateTotals() { const players = [1, 2, 3, 4]; const totals = {1: 0, 2: 0, 3: 0, 4: 0};
@@ -38,6 +40,10 @@ function updateTotals() { const players = [1, 2, 3, 4]; const totals = {1: 0, 2:
 
 // Determine champion let maxPoints = -1; let champion = '---'; players.forEach(p => { if (totals[p] > maxPoints) { maxPoints = totals[p]; champion = document.getElementById('name' + p).textContent; } else if (totals[p] === maxPoints) { champion = 'Tie'; } }); document.getElementById('championName').textContent = champion; }
 
-// Initialize names and totals on page load window.onload = () => { for (let i = 1; i <= 4; i++) { updatePlayerName(i); } }; </script>
+// Save data to localStorage function saveData() { const data = {}; // Save player names for (let i = 1; i <= 4; i++) { data['player' + i] = document.getElementById('player' + i).value; } // Save main category scores document.querySelectorAll('input.score').forEach(input => { data[input.dataset.category + '' + input.dataset.player] = input.value; }); // Save mini chaos checkboxes document.querySelectorAll('input.miniScore').forEach(input => { data[input.dataset.category + '' + input.dataset.player] = input.checked; }); localStorage.setItem('chaoticJapanGameData', JSON.stringify(data)); alert('Data saved locally!'); }
+
+// Load data from localStorage function loadData() { const data = JSON.parse(localStorage.getItem('chaoticJapanGameData')); if (!data) { alert('No saved data found.'); return; } // Load player names for (let i = 1; i <= 4; i++) { document.getElementById('player' + i).value = data['player' + i] || ''; updatePlayerName(i); } // Load main category scores document.querySelectorAll('input.score').forEach(input => { input.value = data[input.dataset.category + '' + input.dataset.player] || ''; }); // Load mini chaos checkboxes document.querySelectorAll('input.miniScore').forEach(input => { input.checked = data[input.dataset.category + '' + input.dataset.player] || false; }); updateTotals(); alert('Data loaded!'); }
+
+// Initialize names and totals on page load window.onload = () => { for (let i = 1; i <= 4; i++) { updatePlayerName(i); } loadData(); }; </script>
 
 May the vending machines guide your destiny.
